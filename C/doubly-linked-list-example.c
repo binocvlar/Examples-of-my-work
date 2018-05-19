@@ -66,6 +66,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Error: Insertion of word failed - a non-zero value was returned by dll_insert_word");
         return 1;
     }
+
     // Display pretty output
     pretty_print(list);
 
@@ -83,7 +84,7 @@ int main(int argc, char* argv[]) {
 dll* dll_new(void) {
 
     // Allocate memory for the doubly-linked list metadata struct
-    dll* list = malloc(sizeof(dll));;
+    dll* list = malloc(sizeof(dll));
     if (list == NULL) {
         // Let the caller handle this NULL
         fprintf(stderr, "dll_new: Unable to allocate memory\n");

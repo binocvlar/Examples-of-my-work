@@ -1,9 +1,22 @@
-.PHONY: dll valgrind
+# Constants
+CC=gcc
+CFLAGS=-Wall -Werror
+OUTPUT_DIR=build
+OBJ=doubly-linked-list-example
 
-doubly-linked-list-example: doubly-linked-list-example.c
-	gcc -Werror -Wall doubly-linked-list-example.c -o doubly-linked-list-example
+# Targets
+.PHONY: clean dll valgrind
 
-dll: doubly-linked-list-example
+all: $(OBJ)
 
-valgrind: doubly-linked-list-example
-	valgrind --leak-check=full ./doubly-linked-list-example
+clean:
+	rm -rf $(OUTPUT_DIR)
+
+build-dir:
+	mkdir -p $(OUTPUT_DIR)
+
+$(OBJ): build-dir $(OBJ).c
+	$(CC) $(CFLAGS) $(OBJ).c -o $(OUTPUT_DIR)/$(OBJ)
+
+valgrind: $(OBJ)
+	valgrind --leak-check=full $(OUTPUT_DIR)/$(OBJ)

@@ -174,7 +174,7 @@ void pretty_print(const dll* list) {
     printf("]\n");
 
 
-    printf(ANSI_GREEN"[+]"ANSI_RST" Traverse the link forwards (the resultant 'word' is forwards):\n");
+    printf(ANSI_GREEN"[+]"ANSI_RST" Traverse the link backwards (the resultant 'word' is forwards):\n");
     mut_node = list->tail;
     printf("        [");
     while (mut_node != NULL) {

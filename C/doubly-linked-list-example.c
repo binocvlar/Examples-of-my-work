@@ -34,9 +34,10 @@ typedef struct dll {
 
 
 /* Prototypes */
-int dll_delete(dll_node *head);
-dll* dll_add_node(dll *list, char c);
 dll* dll_new(void);
+int dll_delete(dll_node *head);
+int dll_add_node(dll *list, char c);
+int dll_delete_node(dll *list, char c);
 int dll_insert_word(char* word, dll* list);
 void pretty_print(const dll* list);
 
@@ -74,6 +75,7 @@ int main(int argc, char* argv[]) {
     int delete_result = dll_delete(list->head);
     if (delete_result != 0) {
         fprintf(stderr, "You must specify a valid dll_node pointer in order to delete the list\n");
+        return 1;
     }
     free(list);
     list = NULL;
@@ -84,7 +86,7 @@ int main(int argc, char* argv[]) {
 dll* dll_new(void) {
 
     // Allocate memory for the doubly-linked list metadata struct
-    dll* list = malloc(sizeof(dll));
+    dll* list = malloc(sizeof(struct dll));
     if (list == NULL) {
         // Let the caller handle this NULL
         fprintf(stderr, "dll_new: Unable to allocate memory\n");
@@ -116,30 +118,30 @@ int dll_delete(dll_node *head) {
 
 
 // dll_add_node inserts a new dll_node into the head position of the doubly-linked list
-dll* dll_add_node(dll *list, char c) {
+int dll_add_node(dll *list, char c) {
     // Create a new doubly-linked list node
-    dll_node *dll = malloc(sizeof(dll_node));
-    if (dll == NULL) {
+    dll_node *node = malloc(sizeof(struct dll_node));
+    if (node == NULL) {
         fprintf(stderr, "malloc returned NULL, not a pointer to a dll_node!\n");
-        return NULL;
+        return 1;
     }
 
     // If this is the first time we've been called, nominate the new node as
     // both the head and the tail of the doubly-linked list
     if (list->tail == NULL) {
-        list->tail = dll;
+        list->tail = node;
     }
 
     // Populate the node, and attach the necessary pointers
-    dll->c = c;
-    dll->prev = NULL;
-    dll->next = list->head;
+    node->c = c;
+    node->prev = NULL;
+    node->next = list->head;
     if (list->head != NULL) {
-        list->head->prev = dll;
+        list->head->prev = node;
     }
-    list->head = dll;
+    list->head = node;
 
-    return list;
+    return 0;
 }
 
 
@@ -148,9 +150,10 @@ dll* dll_add_node(dll *list, char c) {
 int dll_insert_word(char* word, dll* list) {
     // Populate the list with the user's string
     for (int i = 0, len = strlen(word); i < len; i++) {
-        list = dll_add_node(list, word[i]);
-        if (list == NULL) {
-            return -1;
+        int result = dll_add_node(list, word[i]);
+        if (result != 0) {
+            fprintf(stderr, "Failed to insert word, as dll_add_node returned an error");
+            return 1;
         }
     }
     return 0;

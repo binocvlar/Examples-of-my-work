@@ -37,6 +37,7 @@ typedef struct dll {
 dll* dll_new(void);
 int dll_delete(dll_node *head);
 int dll_add_node(dll *list, char c);
+dll_node* dll_find_node(dll_node *head, char c);
 int dll_delete_node(dll *list, char c);
 int dll_insert_word(char* word, dll* list);
 void pretty_print(const dll* list);
@@ -67,6 +68,10 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Error: Insertion of word failed - a non-zero value was returned by dll_insert_word");
         return 1;
     }
+
+    //// Try deleting a char
+    //int deletion = dll_delete_node(list, 'R');
+    //printf("Result of deletion was %i\n", deletion);
 
     // Display pretty output
     pretty_print(list);
@@ -100,7 +105,6 @@ dll* dll_new(void) {
     return list;
 }
 
-
 // dll_delete destroys the doubly-linked list by iteratively freeing allocated memory
 int dll_delete(dll_node *head) {
     if (head == NULL) {
@@ -115,7 +119,6 @@ int dll_delete(dll_node *head) {
     }
     return 0;
 }
-
 
 // dll_add_node inserts a new dll_node into the head position of the doubly-linked list
 int dll_add_node(dll *list, char c) {
@@ -144,6 +147,47 @@ int dll_add_node(dll *list, char c) {
     return 0;
 }
 
+// Returns a pointer to the first matching node
+// If no matching nodes are found, propagates NULL
+dll_node* dll_find_node(dll_node *head, char c) {
+    if (head == NULL) {
+        return NULL;
+    }
+
+    dll_node* mut_node = head;
+    while (mut_node != NULL) {
+        if (mut_node->c == c) {
+            return mut_node;
+        }
+        mut_node = mut_node->next;
+    }
+    return NULL;
+}
+
+// Deletes the first matching node (i.e. the first one to contain 'c')
+int dll_delete_node(dll *list, char c) {
+    dll_node* found_node = dll_find_node(list->head, c);
+    if (found_node == NULL) {
+        return -1;
+    } else {
+        // This check handles the case where the first node in the list is a match
+        if (found_node->prev == NULL) {
+            list->head = found_node->next;
+        } else {
+            found_node->prev->next = found_node->next;
+        }
+        // This check handles the case where the last node in the list is a match
+        if (found_node->next == NULL) {
+            list->tail = found_node->prev;
+        } else {
+            found_node->next->prev = found_node->prev;
+        }
+        // De-alloc the node's memory up the node
+        free(found_node);
+        found_node = NULL;
+        return 0;
+    }
+}
 
 // This function returns inserts an entire word
 // It's defined as a void* return function, as it will only ever return NULL
@@ -158,7 +202,6 @@ int dll_insert_word(char* word, dll* list) {
     }
     return 0;
 }
-
 
 // Walk the dll forwards and backwards, and create some test output while doing so.
 void pretty_print(const dll* list) {
